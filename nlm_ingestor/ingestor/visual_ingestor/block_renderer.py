@@ -337,13 +337,35 @@ class BlockRenderer:
                     }
                 if tab_row:
                     tab_row["block_idx"] = block["block_idx"]
+                    tab_row["box_style"] = block["box_style"]
                     table_rows.append(tab_row)
 
             if 'is_table_end' in block and is_rendering_table:
+                idx = block["block_idx"]
+                print(idx)
                 is_rendering_table = False
                 table_block = render_dict["blocks"][-1] 
                 table_block["table_rows"] = table_rows
-                table_block["bbox"] = [
+
+                                # Initialize the bounds of the large bounding box
+                min_x = float('inf')
+                max_x = 0
+                min_y = float('inf')
+                max_y = 0
+
+                # Iterate through each bounding box and update the bounds
+                for row in table_rows:
+                    box_style = row["box_style"]
+                    min_x = min(min_x, box_style[1])
+                    max_x = max(max_x, box_style[2])
+                    min_y = min(min_y, box_style[0])
+                    max_y = max(max_y, box_style[0] + box_style[4])
+
+                print(f"{min_x},{min_y},{max_x},{max_y}")
+
+                table_block["bbox"] = [min_x, min_y, max_x, max_y]
+                
+                table_block["original_bbox"] = [
                         table_block["left"],
                         table_block["top"],
                         table_block["left"] + block["box_style"][3],
