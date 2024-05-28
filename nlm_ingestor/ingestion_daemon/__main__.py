@@ -14,19 +14,26 @@ app = Flask(__name__)
 logger = logging.getLogger(__name__)
 logger.setLevel(cfg.log_level())
 
-@app.route('/', methods=['GET'])
-def health_check():
-    return 'Service is running', 200
 
-@app.route('/api/parseDocument', methods=['POST'])
+@app.route("/", methods=["GET"])
+def health_check():
+    return "Service is running", 200
+
+
+@app.route("/health", methods=["GET"])
+def health_check():
+    return "ok", 200
+
+
+@app.route("/api/parseDocument", methods=["POST"])
 def parse_document(
     file=None,
     render_format: str = "all",
 ):
-    render_format = request.args.get('renderFormat', 'all')
-    use_new_indent_parser = request.args.get('useNewIndentParser', 'no')
-    apply_ocr = request.args.get('applyOcr', 'no')
-    file = request.files['file']
+    render_format = request.args.get("renderFormat", "all")
+    use_new_indent_parser = request.args.get("useNewIndentParser", "no")
+    apply_ocr = request.args.get("applyOcr", "no")
+    file = request.files["file"]
     tmp_file = None
     try:
         parse_options = {
@@ -34,7 +41,7 @@ def parse_document(
             "render_format": render_format,
             "use_new_indent_parser": use_new_indent_parser == "yes",
             "parse_pages": (),
-            "apply_ocr": apply_ocr == "yes"
+            "apply_ocr": apply_ocr == "yes",
         }
         # save the incoming file to a temporary location
         filename = secure_filename(file.filename)
@@ -70,11 +77,11 @@ def parse_document(
             os.unlink(tmp_file)
     return make_response(jsonify({"status": status, "reason": msg}), rc)
 
+
 def main():
     logger.info("Starting ingestor service..")
-    app.run(host="0.0.0.0", port=5001, debug=False)
+    app.run(host="0.0.0.0", port=8080, debug=False)
+
 
 if __name__ == "__main__":
     main()
-
-
