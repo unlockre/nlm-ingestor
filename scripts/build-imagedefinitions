@@ -1,0 +1,27 @@
+#!/bin/sh
+
+if [ "$IMAGE_TAG" == "" ]; then
+    echo "\$IMAGE_TAG is unset, can not continue"
+    exit 1
+fi
+
+if [ "$REPOSITORY_URI" == "" ]; then
+    echo "\$REPOSITORY_URI is unset, can not continue"
+    exit 1
+fi
+
+if [ "$ECS_CONTAINER_NAME" == "" ]; then
+    echo "\$ECS_CONTAINER_NAME is unset, can not continue"
+    exit 1
+fi
+
+cat <<EOF
+[
+  {
+    "name": "${ECS_CONTAINER_NAME}",
+    "imageUri": "${REPOSITORY_URI}:${IMAGE_TAG}"
+  }
+]
+EOF
+
+exit 0
