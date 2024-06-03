@@ -9,10 +9,11 @@ from nlm_ingestor.ingestor import ingestor_api
 from nlm_utils.utils import file_utils
 
 app = Flask(__name__)
+logging.getLogger("werkzeug").disabled = True
 
 # initialize logging
 logger = logging.getLogger(__name__)
-logger.setLevel(cfg.log_level())
+logger.setLevel("WARNING")
 
 
 @app.route("/", methods=["GET"])

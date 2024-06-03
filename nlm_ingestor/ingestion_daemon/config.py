@@ -24,9 +24,7 @@ def get_config_as_list(key, default: Optional[List] = []):
     return (
         __CFG.get(key)
         if key in __CFG
-        else os.environ.get(key).split(",")
-        if key in os.environ
-        else default
+        else os.environ.get(key).split(",") if key in os.environ else default
     )
 
 
