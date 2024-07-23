@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Datadog setup
+DATADOG_SETUP=""
+if [ "$DATADOG_ENABLED" == "true" ]; then
+  export DD_AGENT_HOST=$(curl --silent ${ECS_CONTAINER_METADATA_URI}/task | jq -r '.Containers[0].Networks[0].IPv4Addresses[0]')
+  DATADOG_SETUP="-javaagent:./jars/dd-java-agent.jar"
+fi
+
+# Set 75% of the total memory as the max heap size
+MAX_HEAP_MEMORY="$(awk '/MemTotal/ {printf "%.0fm\n", ($2/1024)*0.75 == int(($2/1024)*0.75) ? ($2/1024)*0.75 : int(($2/1024)*0.75) + 1}' /proc/meminfo)"
+
+cd /app && exec java -Xmx${MAX_HEAP_MEMORY} ${DATADOG_SETUP} -jar jars/tika-server-standard-nlm-modified-2.9.2_v2.jar

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Datadog setup
+DATADOG_SETUP=""
+if [ "$DATADOG_ENABLED" == "true" ]; then
+  export DD_AGENT_HOST=$(curl --silent ${ECS_CONTAINER_METADATA_URI}/task | jq -r '.Containers[0].Networks[0].IPv4Addresses[0]')
+  DATADOG_SETUP="ddtrace-run "
+fi
+
+WORKERS=16
+TIMEOUT=1200 # 20 minutes
+
+cd /app && exec ${DATADOG_SETUP} gunicorn -b 0.0.0.0:8080 nlm_ingestor.ingestion_daemon.__main__:app --workers=${WORKERS} --timeout ${TIMEOUT}
